@@ -1,0 +1,24 @@
+import spacy
+
+def reference_resolution(text):
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(text)
+
+    references = {}
+    current_reference = None
+
+    for token in doc:
+        if token.dep_ == "pronoun" and token.head.text in references:
+            current_reference = references[token.head.text]
+
+        if token.dep_ == "nsubj":
+            current_reference = token.text
+            references[token.head.text] = current_reference
+
+    return references
+
+# Example usage:
+text = "John has a cat. He loves it."
+resolved_references = reference_resolution(text)
+
+print("Resolved References:", resolved_references)
