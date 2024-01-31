@@ -1,0 +1,26 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Sample documents
+documents = [
+    "TF-IDF is a technique for information retrieval.",
+    "It measures the importance of a word in a document relative to a collection.",
+    "The higher the TF-IDF score, the more important the word is for that document."
+]
+
+# Query
+query = "TF-IDF importance in information retrieval"
+
+# TF-IDF Vectorizer
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(documents + [query])
+
+# Compute cosine similarity
+cosine_similarities = cosine_similarity(tfidf_matrix[-1], tfidf_matrix[:-1]).flatten()
+
+# Rank documents based on similarity
+ranked_documents = sorted(enumerate(cosine_similarities), key=lambda x: x[1], reverse=True)
+
+print("Ranked Documents:")
+for idx, score in ranked_documents:
+    print(f"Document {idx + 1}: Similarity Score = {score}")
