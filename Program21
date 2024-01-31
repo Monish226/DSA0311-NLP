@@ -1,0 +1,17 @@
+import spacy
+
+def syntax_driven_semantic_analysis(sentence):
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(sentence)
+
+    noun_phrases = [chunk.text for chunk in doc.noun_chunks]
+    meanings = {chunk.text: chunk.root.head.lemma_ for chunk in doc.noun_chunks}
+
+    return noun_phrases, meanings
+
+# Example usage:
+sentence = "The cat is sitting on the mat."
+noun_phrases, meanings = syntax_driven_semantic_analysis(sentence)
+
+print("Noun Phrases:", noun_phrases)
+print("Meanings:", meanings)
