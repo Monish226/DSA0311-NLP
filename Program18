@@ -1,0 +1,24 @@
+from pyparsing import Word, alphas, Forward, oneOf, Group, ZeroOrMore, infixNotation, opAssoc
+
+# Define FOPC grammar
+identifier = Word(alphas)
+variable = identifier
+constant = identifier
+quantifier = oneOf("forall exists")
+connective = oneOf("and or implies iff not")
+predicate = identifier + "(" + Group(variable + ZeroOrMore("," + variable)) + ")"
+expression = Forward()
+
+# Define expression in FOPC
+expression << (quantifier + variable + expression |
+               connective + Group(expression) |
+               predicate)
+
+fopc_parser = infixNotation(expression,
+                            [(connective, 2, opAssoc.LEFT, lambda tokens: tokens[0]),
+                             (quantifier, 1, opAssoc.RIGHT, lambda tokens: tokens[0])])
+
+# Example usage:
+fopc_formula = "forall x (P(x) and Q(x)) implies exists y R(y)"
+parsed_formula = fopc_parser.parseString(fopc_formula)
+print("Parsed Formula:", parsed_formula)
