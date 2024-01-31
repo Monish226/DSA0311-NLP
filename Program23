@@ -1,0 +1,25 @@
+import nltk
+from nltk.corpus import wordnet
+
+def coherence_evaluation(text):
+    sentences = nltk.sent_tokenize(text)
+    coherence_score = 0
+
+    for i in range(len(sentences) - 1):
+        words_a = set(nltk.word_tokenize(sentences[i]))
+        words_b = set(nltk.word_tokenize(sentences[i + 1]))
+
+        common_words = words_a.intersection(words_b)
+
+        # Use WordNet to measure semantic similarity
+        semantic_similarity = sum(wordnet.synsets(word).max_depth() for word in common_words)
+
+        coherence_score += semantic_similarity
+
+    return coherence_score
+
+# Example usage:
+text = "The sun is shining. Birds are singing. It's a beautiful day."
+score = coherence_evaluation(text)
+
+print("Coherence Score:", score)
