@@ -1,0 +1,10 @@
+from nltk.wsd import lesk
+from nltk import word_tokenize
+
+sentence = "I saw a bat flying in the cave."
+word_to_disambiguate = "bat"
+
+sense = lesk(word_tokenize(sentence), word_to_disambiguate)
+print(f"Word: {word_to_disambiguate}")
+print(f"Sense: {sense}")
+print(f"Definition: {sense.definition()}")
