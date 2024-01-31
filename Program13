@@ -1,0 +1,92 @@
+class ParseTreeNode:
+    def __init__(self, label, children=None):
+        self.label = label
+        self.children = children or []
+
+    def __str__(self, level=0):
+        result = "\t" * level + self.label + "\n"
+        for child in self.children:
+            result += child.__str__(level + 1)
+        return result
+
+class CFGParser:
+    def __init__(self, grammar):
+        self.grammar = grammar
+
+    def parse(self, sentence):
+        chart = [[[] for _ in range(len(sentence) + 1)] for _ in range(len(sentence) + 1)]
+        self.predict(0, 'S', chart, 0)
+        self.fill_chart(sentence, chart)
+        self.complete(chart, 0, len(sentence))
+
+        # Check if the final state is in the last position of the chart
+        final_state = ('S', ('NP', 'VP'), 0, 0)
+        if final_state in chart[0][len(sentence)]:
+            print("Parsing successful!")
+            parse_tree = self.build_parse_tree(chart, 'S', 0, len(sentence))
+            print("Parse Tree:")
+            print(parse_tree)
+        else:
+            print("Parsing failed!")
+
+    def predict(self, position, non_terminal, chart, start_position):
+        for production in self.grammar.get(non_terminal, []):
+            chart[position][position].append((non_terminal, production, 0, start_position))
+
+    def scan(self, position, input_string, chart):
+        if position < len(input_string):
+            for state in chart[position][position]:
+                _, production, dot, start_position = state
+                if dot < len(production) and production[dot] == input_string[position]:
+                    chart[position][position + 1].append((production[dot], production, dot + 1, start_position))
+
+    def complete(self, chart, start_position, end_position):
+        for position in range(start_position, end_position + 1):
+            for state in chart[start_position][position]:
+                _, production, dot, start = state
+                if dot == len(production):
+                    for st in chart[start][start_position]:
+                        _, prod, d, sp = st
+                        if d < len(prod) and prod[d] == _:
+                            chart[start_position][position].append((prod[d], prod, d + 1, sp))
+
+    def fill_chart(self, input_string, chart):
+        for i in range(len(input_string) + 1):
+            self.scan(i, input_string, chart)
+            for state in chart[i][i]:
+                self.complete(chart, i, i)
+
+    def build_parse_tree(self, chart, non_terminal, start, end):
+        if start == end:
+            return ParseTreeNode(non_terminal, [ParseTreeNode(chart[start][end][0][0])])
+
+        children = []
+        for state in chart[start][end]:
+            _, production, dot, _ = state
+            if dot > 0:
+                child_start = start
+                child_end = start + dot
+                child_label = production[dot - 1]
+                children.append(self.build_parse_tree(chart, child_label, child_start, child_end))
+
+        return ParseTreeNode(non_terminal, children)
+
+# Example usage:
+# Define a context-free grammar
+grammar_rules = {
+    'S': [['NP', 'VP']],
+    'NP': [['Det', 'N'], ['Det', 'N', 'PP']],
+    'VP': [['V', 'NP'], ['V', 'NP', 'PP']],
+    'PP': [['P', 'NP']],
+    'Det': ['the', 'a'],
+    'N': ['dog', 'cat', 'man', 'woman'],
+    'V': ['chased', 'caught', 'bit', 'kissed'],
+    'P': ['in', 'on', 'by', 'with']
+}
+
+# Create a CFGParser object
+cfg_parser = CFGParser(grammar_rules)
+
+# Parse a sentence and generate a parse tree
+sentence = "the dog chased the cat"
+cfg_parser.parse(sentence)
