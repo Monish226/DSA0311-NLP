@@ -1,0 +1,25 @@
+class AgreementChecker:
+    def __init__(self, grammar_rules):
+        self.grammar_rules = grammar_rules
+
+    def check_agreement(self, sentence):
+        # Implement your agreement checking logic based on CFG rules
+        # Return True if agreement is correct, else False
+        pass
+
+# Example usage:
+grammar_rules = {
+    'S': [['NP', 'VP']],
+    'NP': [['Det', 'N'], ['Det', 'N', 'PP']],
+    'VP': [['V', 'NP'], ['V', 'NP', 'PP']],
+    'PP': [['P', 'NP']],
+    'Det': ['the', 'a'],
+    'N': ['dog', 'cat', 'man', 'woman'],
+    'V': ['chased', 'caught', 'bite', 'kiss'],
+    'P': ['in', 'on', 'by', 'with']
+}
+
+agreement_checker = AgreementChecker(grammar_rules)
+sentence = "the dog chases the cat"
+result = agreement_checker.check_agreement(sentence)
+print("Agreement is correct:", result)
