@@ -1,0 +1,60 @@
+class CFG:
+    def __init__(self, rules):
+        self.rules = rules
+
+    def parse(self, input_string):
+        self.input_string = input_string
+        self.index = 0
+
+        # Start parsing from the start symbol
+        if self.parse_symbol('S'):
+            print("Parsing successful!")
+        else:
+            print("Parsing failed!")
+
+    def parse_symbol(self, symbol):
+        if self.index == len(self.input_string):
+            return False
+
+        for rule in self.rules[symbol]:
+            success = True
+            original_index = self.index
+
+            for part in rule:
+                if isinstance(part, str):  # Terminal symbol
+                    if self.input_string[self.index] != part:
+                        success = False
+                        break
+                    self.index += 1
+                else:  # Non-terminal symbol
+                    if not self.parse_symbol(part):
+                        success = False
+                        break
+
+            if success:
+                return True
+            else:
+                self.index = original_index
+
+        return False
+
+
+# Example usage:
+# Define a context-free grammar
+grammar_rules = {
+    'S': [['NP', 'VP']],
+    'NP': [['Det', 'N'], ['Det', 'N', 'PP']],
+    'VP': [['V', 'NP'], ['V', 'NP', 'PP']],
+    'PP': [['P', 'NP']],
+    'Det': ['the', 'a'],
+    'N': ['dog', 'cat', 'man', 'woman'],
+    'V': ['chased', 'caught', 'bit', 'kissed'],
+    'P': ['in', 'on', 'by', 'with']
+}
+
+# Create a CFG object
+cfg = CFG(grammar_rules)
+
+# Parse a sentence
+sentence = "the dog chased the cat"
+cfg.parse(sentence)
