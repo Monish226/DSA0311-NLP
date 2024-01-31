@@ -1,0 +1,20 @@
+import spacy
+
+def dialog_act_recognition(sentence):
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(sentence)
+
+    for token in doc:
+        if token.pos_ == "VERB" and token.dep_ == "ROOT":
+            return "Statement"
+
+        if token.pos_ == "AUX" and token.dep_ == "aux":
+            return "Question"
+
+    return "Other"
+
+# Example usage:
+sentence = "What is the weather like today?"
+dialog_act = dialog_act_recognition(sentence)
+
+print("Dialog Act:", dialog_act)
