@@ -4,7 +4,7 @@ from nltk.corpus import wordnet
 def coherence_evaluation(text):
     sentences = nltk.sent_tokenize(text)
     coherence_score = 0
-
+#m
     for i in range(len(sentences) - 1):
         words_a = set(nltk.word_tokenize(sentences[i]))
         words_b = set(nltk.word_tokenize(sentences[i + 1]))
